@@ -4,10 +4,12 @@ import CreateResponses from '../Components/CreateResponses';
 class Posts extends Component{
 
         state = {
-             posts: []
+             posts: [],
+             responses: []
         };
       
       componentDidMount() { 
+        //Posts
         fetch('http://localhost:4000/posts')
         .then(function(response) {
             return response.json();
@@ -17,7 +19,16 @@ class Posts extends Component{
                 posts: myjson
             })
         });
-
+        //Responses
+        fetch('http://localhost:4000/responses')
+        .then(function(response) {
+            return response.json();
+        })
+        .then(myjson =>{
+            this.setState({
+                responses: myjson
+            })
+        });
       }
       
 
@@ -25,7 +36,21 @@ class Posts extends Component{
 
     
 render() {
-    var {posts} = this.state;
+    var {posts, responses} = this.state;
+
+        for (let index = 0; index < posts.length; index++) {
+            posts[index].responses = [];
+            for (let i = 0; i < responses.length; i++) {
+                if(posts[index].post_id === responses[i].post_id){
+                posts[index].responses.push(responses[i]);
+            }
+            }
+            }
+        
+
+            
+        
+        
 
         const listPosts = posts.map((post) =>
         <div className="card m-3" key={post.post_id}>
@@ -36,12 +61,14 @@ render() {
             {post.post_content}
         </div>
         <div className="card-footer text-muted">
-        <i class="fas fa-comments"></i> Responses
+        <i className="fas fa-comments"></i> Responses
         </div>
         <ul className="list-group list-group-flush">
-            <li class="list-group-item">Cras justo odio</li>
-            <li class="list-group-item">Dapibus ac facilisis in</li>
-            <li class="list-group-item">Vestibulum at eros</li>
+            {
+                post.responses.map((r)=>
+                 <li className="list-group-item" key={r.response_id}>{r.response_content}</li>
+                )
+            }
         </ul>
         <CreateResponses id_post={post.post_id}/>
         </div>
